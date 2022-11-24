@@ -88,13 +88,13 @@ def getPysamSamfile(inputBAM, reference_genome):
     seq_filename, seq_ext = os.path.splitext(inputBAM)
     if seq_ext == ".cram":
         if os.path.isfile(reference_genome):
-            bamfile = pysam.Samfile(inputBAM, "rc", reference_filename=reference_genome)
+            bamfile = pysam.AlignmentFile(inputBAM, "rc", reference_filename=reference_genome)
         else:
-            # bamfile = pysam.Samfile(inputBAM, "rc")
+            # bamfile = pysam.AlignmentFile(inputBAM, "rc")
             print("Please enter the reference genome, when reading the cram file.")
             sys.exit(1)
     else:
-        bamfile = pysam.Samfile(inputBAM, "rb")
+        bamfile = pysam.AlignmentFile(inputBAM, "rb")
     return bamfile
 
 
