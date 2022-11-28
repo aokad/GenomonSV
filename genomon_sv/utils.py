@@ -36,10 +36,10 @@ def compress_index_bed(inputFile, outputFile):
     ####################
 
 
-def sortBedpe(inputFile, outputFile):
+def sortBedpe(inputFile, outputFile, sort_option):
 
     hOUT = open(outputFile, "w")
-    subprocess.call(["sort", "-k1,1", "-k2,2n", "-k4,4", "-k5,5n", inputFile], stdout = hOUT)
+    subprocess.call(["sort", "-k1,1", "-k2,2n", "-k4,4", "-k5,5n"] + sort_option.split(" ") + [inputFile], stdout = hOUT)
     hOUT.close()
 
 
