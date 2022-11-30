@@ -128,6 +128,7 @@ def create_parser():
                              help = "Use Genome Reference Consortium nomenclature rather than UCSC (default: %(default)s)")
 
     filt_parser.add_argument("--debug", default = False, action = 'store_true', help = "keep intermediate files")
+    filt_parser.add_argument("--debug_stage", default = 1, type=int, help = "The number of debug run stage")
 
     filt_parser.add_argument('--thread_num', default = 1, type=int,
                              help = "The number of threads")

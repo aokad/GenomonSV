@@ -16,53 +16,54 @@ from scipy import stats
 
 def genomon_sv_filt_main(output_prefix, args, thread_str = ""):
 
-    utils.processingMessage("Filtering by # of breakpoint containing read pairs and variant sizes" + thread_str)
-    filterJuncNumAndSize(output_prefix + ".junction.clustered.bedpe.gz",
-                         output_prefix + ".junction.clustered.filt1.bedpe",
-                         args.min_junc_num, args.min_sv_size, args.min_inversion_size)
-
-    utils.processingMessage("Filtering by nonmatched control panel" + thread_str)
-    filterNonMatchControl(output_prefix + ".junction.clustered.filt1.bedpe",
-                          output_prefix + ".junction.clustered.filt2.bedpe",
-                          args.non_matched_control_junction,
-                          args.matched_control_label,
-                          args.control_panel_num_thres, args.control_panel_check_margin)
-
-    utils.processingMessage("Incorporating improperly alinged read pair infomation" + thread_str)
-    addImproperInfo(output_prefix + ".junction.clustered.filt2.bedpe",
-                    output_prefix + ".junction.clustered.filt3.bedpe",
-                    args.output_prefix + ".improper.clustered.bedpe.gz")
-
-    utils.processingMessage("Filtering by sizes of covered regions, mapping quality and # of support read pairs" + thread_str)
-    filterMergedJunc(output_prefix + ".junction.clustered.filt3.bedpe",
-                     output_prefix + ".junction.clustered.filt4.bedpe",
-                     args.min_support_num, args.min_mapping_qual, args.min_overhang_size)
-
-    utils.processingMessage("Filtering too close candidates" + thread_str)
-    removeClose(output_prefix + ".junction.clustered.filt4.bedpe",
-                output_prefix + ".junction.clustered.filt5.bedpe",
-                args.close_check_margin, args.close_check_thres)
-
-    realignment_tool = 'blat' if args.blat == True else 'edlib'
-    utils.processingMessage("Performing realignments using " + realignment_tool + thread_str)
-    validateByRealignment(output_prefix + ".junction.clustered.filt5.bedpe",
-                          output_prefix + ".junction.clustered.filt6.bedpe",
-                          args.bam_file, args.matched_control_bam, args.reference_genome, args.blat_option,
-                          args.short_tandem_reapeat_thres, args.max_depth, args.search_length, args.search_margin, 
-                          args.split_refernece_thres, args.validate_sequence_length, args.blat)
-
-    utils.processingMessage("Filtering allele frequencies, Fisher's exact test p-values and # of support read pairs" + thread_str)
-    filterNumAFFis(output_prefix + ".junction.clustered.filt6.bedpe", 
-                   output_prefix + ".junction.clustered.filt7.bedpe",
-                   args.matched_control_bam,
-                   args.min_tumor_variant_read_pair, args.min_tumor_allele_freq, 
-                   args.max_control_variant_read_pair, args.max_control_allele_freq,
-                   args.max_fisher_pvalue)
-
-    utils.processingMessage("Adding annotation" + thread_str)
-    annotationFunction.addAnnotation(output_prefix + ".junction.clustered.filt7.bedpe",
-                                     output_prefix + ".genomonSV.result.txt",
-                                     args.genome_id, args.grc)
+    if args.debug_stage == 0:
+        utils.processingMessage("Filtering by # of breakpoint containing read pairs and variant sizes" + thread_str)
+        filterJuncNumAndSize(output_prefix + ".junction.clustered.bedpe.gz",
+                             output_prefix + ".junction.clustered.filt1.bedpe",
+                             args.min_junc_num, args.min_sv_size, args.min_inversion_size)
+    elif args.debug_stage == 1:
+        utils.processingMessage("Filtering by nonmatched control panel" + thread_str)
+        filterNonMatchControl(output_prefix + ".junction.clustered.filt1.bedpe",
+                              output_prefix + ".junction.clustered.filt2.bedpe",
+                              args.non_matched_control_junction,
+                              args.matched_control_label,
+                              args.control_panel_num_thres, args.control_panel_check_margin)
+    elif args.debug_stage == 2:
+        utils.processingMessage("Incorporating improperly alinged read pair infomation" + thread_str)
+        addImproperInfo(output_prefix + ".junction.clustered.filt2.bedpe",
+                        output_prefix + ".junction.clustered.filt3.bedpe",
+                        args.output_prefix + ".improper.clustered.bedpe.gz")
+    elif args.debug_stage == 3:
+        utils.processingMessage("Filtering by sizes of covered regions, mapping quality and # of support read pairs" + thread_str)
+        filterMergedJunc(output_prefix + ".junction.clustered.filt3.bedpe",
+                         output_prefix + ".junction.clustered.filt4.bedpe",
+                         args.min_support_num, args.min_mapping_qual, args.min_overhang_size)
+    elif args.debug_stage == 4:
+        utils.processingMessage("Filtering too close candidates" + thread_str)
+        removeClose(output_prefix + ".junction.clustered.filt4.bedpe",
+                    output_prefix + ".junction.clustered.filt5.bedpe",
+                    args.close_check_margin, args.close_check_thres)
+    elif args.debug_stage == 5:
+        realignment_tool = 'blat' if args.blat == True else 'edlib'
+        utils.processingMessage("Performing realignments using " + realignment_tool + thread_str)
+        validateByRealignment(output_prefix + ".junction.clustered.filt5.bedpe",
+                              output_prefix + ".junction.clustered.filt6.bedpe",
+                              args.bam_file, args.matched_control_bam, args.reference_genome, args.blat_option,
+                              args.short_tandem_reapeat_thres, args.max_depth, args.search_length, args.search_margin, 
+                              args.split_refernece_thres, args.validate_sequence_length, args.blat)
+    elif args.debug_stage == 6:
+        utils.processingMessage("Filtering allele frequencies, Fisher's exact test p-values and # of support read pairs" + thread_str)
+        filterNumAFFis(output_prefix + ".junction.clustered.filt6.bedpe", 
+                       output_prefix + ".junction.clustered.filt7.bedpe",
+                       args.matched_control_bam,
+                       args.min_tumor_variant_read_pair, args.min_tumor_allele_freq, 
+                       args.max_control_variant_read_pair, args.max_control_allele_freq,
+                       args.max_fisher_pvalue)
+    else:
+        utils.processingMessage("Adding annotation" + thread_str)
+        annotationFunction.addAnnotation(output_prefix + ".junction.clustered.filt7.bedpe",
+                                         output_prefix + ".genomonSV.result.txt",
+                                         args.genome_id, args.grc)
 
     if args.debug == False:
         subprocess.call(["rm", output_prefix + ".junction.clustered.filt1.bedpe"])
